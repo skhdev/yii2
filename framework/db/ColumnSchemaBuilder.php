@@ -35,11 +35,15 @@ class ColumnSchemaBuilder extends Object
      */
     protected $isNotNull = false;
     /**
+     * @var boolean whether the column is unsigned. If this is `true`, a `UNSIGNED` attribute will be added.
+     */
+    protected $isUnsigned = false;
+    /**
      * @var boolean whether the column values should be unique. If this is `true`, a `UNIQUE` constraint will be added.
      */
     protected $isUnique = false;
     /**
-     * @var string the `CHECK` constraint for the column.
+     * @var array list of the `CHECK` constraint for the column.
      */
     protected $check;
     /**
@@ -73,6 +77,16 @@ class ColumnSchemaBuilder extends Object
     }
 
     /**
+     * Adds a `UNSIGNED` to permit only nonnegative numbers.
+     * @return $this
+     */
+    public function unsigned()
+    {
+        $this->isUnsigned = true;
+        return $this;
+    }
+
+    /**
      * Adds a `UNIQUE` constraint to the column.
      * @return $this
      */
@@ -89,7 +103,7 @@ class ColumnSchemaBuilder extends Object
      */
     public function check($check)
     {
-        $this->check = $check;
+        $this->check[] = $check;
         return $this;
     }
 
@@ -197,10 +211,15 @@ class ColumnSchemaBuilder extends Object
 
     /**
      * Builds the check constraint for the column.
+     * @param bool $ignoreUnsigned
      * @return string a string containing the CHECK constraint.
      */
-    protected function buildCheckString()
+    protected function buildCheckString($ignoreUnsigned = false)
     {
-        return $this->check !== null ? " CHECK ({$this->check})" : '';
+        if ($ignoreUnsigned === false && $this->isUnsigned !== false) {
+            $this->check[] = 'value > 0';
+        }
+
+        return empty($this->check) ? '' : ' CHECK (' . implode(' AND ', $this->check) . ')';
     }
 }

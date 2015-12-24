@@ -24,6 +24,7 @@ class OracleQueryBuilderTest extends QueryBuilderTest
             [Schema::TYPE_PK . '(8)', $this->primaryKey(8), 'NUMBER(8) NOT NULL PRIMARY KEY'],
             [Schema::TYPE_PK . ' CHECK (value > 5)', $this->primaryKey()->check('value > 5'), 'NUMBER(10) NOT NULL PRIMARY KEY CHECK (value > 5)'],
             [Schema::TYPE_PK . '(8) CHECK (value > 5)', $this->primaryKey(8)->check('value > 5'), 'NUMBER(8) NOT NULL PRIMARY KEY CHECK (value > 5)'],
+            [Schema::TYPE_PK . ' CHECK (value > 0)', $this->primaryKey()->unsigned(), 'NUMBER(10) NOT NULL PRIMARY KEY CHECK (value > 0)'],
             [Schema::TYPE_STRING, $this->string(), 'VARCHAR2(255)'],
             [Schema::TYPE_STRING . '(32)', $this->string(32), 'VARCHAR2(32)'],
             [Schema::TYPE_STRING . ' CHECK (value LIKE \'test%\')', $this->string()->check('value LIKE \'test%\''), 'VARCHAR2(255) CHECK (value LIKE \'test%\')'],

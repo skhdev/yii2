@@ -217,4 +217,25 @@ class QueryBuilder extends \yii\db\QueryBuilder
             . (!empty($names) ? ' (' . implode(', ', $names) . ')' : '')
             . (!empty($placeholders) ? ' VALUES (' . implode(', ', $placeholders) . ')' : ' DEFAULT VALUES');
     }
+
+    /**
+     * @inheritdoc
+     */
+    public function getColumnType($type)
+    {
+        $pkUnsigned = false;
+        if (preg_match('/^(\w+)(.*)$/', $type, $matches)) {
+            if(in_array($matches[1], array(Schema::TYPE_PK, Schema::TYPE_BIGPK)) && strpos($type, 'UNSIGNED') !== false) {
+                $pkUnsigned = true;
+            }
+        }
+
+        $type = parent::getColumnType($type);
+
+        if($pkUnsigned) {
+            $type = str_replace(array(' UNSIGNED', 'NOT NULL'), array('', 'UNSIGNED NOT NULL'), $type);
+        }
+
+        return $type;
+    }
 }
